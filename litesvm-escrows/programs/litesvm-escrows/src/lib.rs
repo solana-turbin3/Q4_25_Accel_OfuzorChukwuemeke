@@ -21,13 +21,21 @@ pub mod litesvm_escrows {
     pub fn make(
         ctx: Context<Make>,
         seed: u64,
-        deposit_amount: u64,
-        receive_amount: u64,
-        unlock_time: i64,
+        deposit: u64,
+        receive: u64,
+        open_in: i64,
     ) -> Result<()> {
-        Make::handler(ctx, seed, deposit_amount, receive_amount, unlock_time)
+        ctx.accounts
+            .init_escrow(seed, receive, open_in, &ctx.bumps)?;
+        ctx.accounts.deposit(deposit)
+    }
+
+     pub fn take(ctx: Context<Take>) -> Result<()> {
+        ctx.accounts.deposit()?;
+        ctx.accounts.withdraw_and_close_vault()
+    }
+
+    pub fn cancel(ctx: Context<Cancel>) -> Result<()> {
+        ctx.accounts.cancel_and_close_vault()
     }
 }
-
-#[derive(Accounts)]
-pub struct Initialize {}
